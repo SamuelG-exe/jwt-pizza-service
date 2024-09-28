@@ -18,5 +18,6 @@ test('login', async () => {
 
   const { password, ...user } = { ...testUser, roles: [{ role: 'diner' }] };
   expect(loginRes.body.user).toMatchObject(user);
-  expect(password).toBeTruthy;
+  expect(password).toBeTruthy;//Need to fix this test to be useful lol 
+
 });
