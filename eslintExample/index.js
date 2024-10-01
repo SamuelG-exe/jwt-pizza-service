@@ -5,17 +5,13 @@ class Info {
   }
   
   class Weather extends Info {
-    constructor() {}
+    constructor() {super();}
   
     report(weatherInfo) {
-      if (true) {
-        weatherInfo = weatherInfo;
         this.data.push(weatherInfo);
-      }
     }
   
     getAverageTemperature() {
-      let total = 0;
       let sum = 0;
       if (this.data.length > 0) {
         for (let i = 0; i < this.data.length; i++) {
@@ -25,7 +21,6 @@ class Info {
         return sum / this.data.length;
       }
       return sum;
-      return sum;
     }
   }
   
@@ -34,5 +29,4 @@ class Info {
   weather.report({ temperature: 30, humidity: 70 });
   console.log(weather.getAverageTemperature());
   
-  Weather = new Weather();
   console.log(weather.getAverageTemperature());
