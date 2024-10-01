@@ -1,9 +1,25 @@
 const request = require('supertest');
 const app = require('../service');
+const { Role, DB } = require('../database/database.js');
+
 
 const testUser = { name: 'pizza diner', email: 'reg@test.com', password: 'a' };
 let testUserAuthToken;
 let testUserId;
+
+function randomName() {
+  return Math.random().toString(36).substring(2, 12);
+}
+async function createAdminUser() {
+    let user = { password: 'toomanysecrets', roles: [{ role: Role.Admin }] };
+    user.name = randomName();
+    user.email = user.name + '@admin.com';
+  
+    await DB.addUser(user);
+  
+    user.password = 'toomanysecrets';
+    return user;
+  }
 
 beforeAll(async () => {
   testUser.email = Math.random().toString(36).substring(2, 12) + '@test.com';
@@ -51,13 +67,12 @@ test('Update user', async () => {
 });
 
 test('Update user Admin', async () => {
-  const adminUser = { name: 'Admin', email: 'admin@test.com', password: 'adminPassword', role: 'admin' };
-  const adminRegisterRes = await request(app).post('/api/auth').send(adminUser);
-  const adminAuthToken = adminRegisterRes.body.token;
+  const adminUser = await createAdminUser();
+  const adminAuthToken = (await request(app).put('/api/auth').send(adminUser)).body.token;
 
   const updateData = { email: 'updated@test.com', password: 'updatedPassword' };
   const updateRes = await request(app)
-    .put(`/api/auth/${adminRegisterRes.body.user.id}`) 
+    .put(`/api/auth/${testUserId}`) 
     .set('Authorization', `Bearer ${adminAuthToken}`)
     .send(updateData);
 
@@ -89,5 +104,6 @@ test('Failed logout', async () => {
   expect(logoutRes.status).toBe(401);
   expect(logoutRes.body).toEqual({ message: 'unauthorized' });
 });
+
 
 
