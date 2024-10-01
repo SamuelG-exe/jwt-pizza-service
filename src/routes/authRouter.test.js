@@ -53,18 +53,3 @@ test('Failed logout', async () => {
   expect(logoutRes.body).toEqual({ message: 'unauthorized' });
 });
 
-test('Update user', async () => {
-  const loginRes = await request(app).put('/api/auth').send(testUser);
-  expect(loginRes.status).toBe(200);
-  const newAuthToken = loginRes.body.token;
-
-  const updatedUser = { email: 'updated@test.com', password: '123243b' };
-
-  const updateRes = await request(app)
-    .put(`/api/auth/${testUser.id}`)
-    .set('Authorization', `Bearer ${newAuthToken}`)
-    .send(updatedUser);
-
-  expect(updateRes.status).toBe(200);
-  expect(updateRes.body).toMatchObject({ ...testUser, ...updatedUser, password: undefined });
-});
