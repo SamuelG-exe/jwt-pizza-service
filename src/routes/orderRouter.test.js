@@ -17,6 +17,7 @@ async function createAdminUser() {
       user.password = 'toomanysecrets';
       return user;
 }
+/*
 async function createFranchiseWithStore(){
     const testUser = { name: randomName(), email: randomName()+'@test.com', password: 'a' };
     await request(app).post('/api/auth').send(testUser);
@@ -43,7 +44,7 @@ async function createFranchiseWithStore(){
       .send(store);
 
       return([franchiseRes, addStoreRes]);
-  };
+};*/
 
 let adminAuthToken;
 let adminUser;
