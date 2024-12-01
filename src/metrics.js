@@ -90,7 +90,7 @@ class Metrics {
   }
 
   sendMetricToGrafana(metricPrefix, metricName, metricValue) {
-    const metric = `${metricPrefix},source=${config.Metrics.source}, ${metricName}=${metricValue}, ${this.getCurrentTimeToString()}`;
+    const metric = `${metricPrefix},source=${config.metrics.source}, ${metricName}=${metricValue}, ${this.getCurrentTimeToString()}`;
 
     fetch(`${config.metrics.url}`, {
       method: 'post',
