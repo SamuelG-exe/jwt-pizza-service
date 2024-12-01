@@ -184,5 +184,5 @@ getAverageLatency(type){
 }
 
 
-module.exports = Metrics;
-
+const metrics = new Metrics();
+module.exports = metrics;
