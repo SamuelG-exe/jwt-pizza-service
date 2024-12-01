@@ -52,7 +52,7 @@ class Metrics {
     if (this.timer) {
       clearInterval(this.timer);
     }
-    const timer = setInterval(() => {
+    this.timer = setInterval(() => {
       try {
 
         // HTTP Methods metrics
