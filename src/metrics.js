@@ -3,6 +3,7 @@ const config = require('./config');
 const os = require('os');
 
 class Metrics {
+  
   constructor() {
     this.timer = null;
     this.totalRequests = 0;
@@ -28,10 +29,7 @@ class Metrics {
 
 
     // This will periodically sent metrics to Grafana
-    const timer = setInterval(() => {
-      this.sendMetricToGrafana('request', 'all', 'total', this.totalRequests);
-    }, 10000);
-    timer.unref();
+    this.sendMetricsPeriodically(10000);
   }
 
 
