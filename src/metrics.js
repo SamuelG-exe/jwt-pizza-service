@@ -1,9 +1,10 @@
-app.use(metrics.requestTracker);
+const config = require('./config'); 
 
 const os = require('os');
 
 class Metrics {
   constructor() {
+    this.timer = null;
     this.totalRequests = 0;
     this.httpMethods = {
       GET: 0,
@@ -48,6 +49,9 @@ class Metrics {
   }
 
  sendMetricsPeriodically(period) {
+    if (this.timer) {
+      clearInterval(this.timer);
+    }
     const timer = setInterval(() => {
       try {
 
@@ -75,13 +79,13 @@ class Metrics {
         // System metrics
         this.sendMetricToGrafana('system', 'memory_usage', this.getMemoryUsagePercentage());
         this.sendMetricToGrafana('system', 'cpu_load', this.getCpuUsagePercentage());
-      } 
-        
-        catch (error) {
-        console.log('Error sending metrics', error);
+        } catch (error) {
+          console.log('Error sending metrics', error);
       }
     }, period);
+      this.timer.unref();
   }
+  
 
   getCurrentTimeToString(){
     return (Math.floor(Date.now())).toString();
@@ -110,25 +114,25 @@ class Metrics {
 //Helper Function to call in other files 
 
 // HTTP Request Trackers
-requestTracker = (req, res, next) => {
+requestTracker(req, res, next) {
   this.totalRequests++;
-  if (this.httpMethods.hasOwnProperty(req.method)) {
-    this.httpMethods[req.method]++;
+  if (Object.prototype.hasOwnProperty.call(this.httpMethods, req.method)) {
+      this.httpMethods[req.method]++;
   }
   next();
 }
 
 // Pizza Sales Trackers
-trackPizzaSale = (revenue) => {
+trackPizzaSale(revenue){
   this.pizzaSales.sales++;
   this.pizzaSales.revenue += revenue;
 }
 
-trackPizzaFailure = () => {
+trackPizzaFailure(){
   this.pizzaSales.numFails++;
 }
 
-trackPizzaLatency = (startTime) => {
+trackPizzaLatency(startTime){
   const latency = Date.now() - startTime;
   this.pizzaSales.createLatency.push(latency);
   
@@ -138,7 +142,7 @@ trackPizzaLatency = (startTime) => {
   }
 }
 
-trackGeneralLatency = (startTime) => {
+trackGeneralLatency(startTime){
   const latency = Date.now() - startTime;
   this.httpMethods.generalLatency.push(latency);
   
@@ -149,25 +153,25 @@ trackGeneralLatency = (startTime) => {
 }
 
 // Authentication Trackers
-trackAuthSuccess = () => {
+trackAuthSuccess(){
   this.authMetrics.sucsessful++;
 }
 
-trackAuthFailure = () => {
+trackAuthFailure(){
   this.authMetrics.failed++;
 }
 
 // User Trackers
-trackUserLogin = () => {
+trackUserLogin(){
   this.currentUsers++;
 }
 
-trackUserLogout = () => {
+trackUserLogout(){
   this.currentUsers = Math.max(0, this.currentUsers - 1);
 }
 
 // Helper to get average latency
-getAverageLatency = (type) => {
+getAverageLatency(type){
   const latencyArray = type === 'pizza' 
     ? this.pizzaSales.createLatency 
     : this.httpMethods.generalLatency;
