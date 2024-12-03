@@ -85,21 +85,18 @@ class Metrics {
   }
   
 
-  getCurrentTimeToString(){
-    return (Math.floor(Date.now())).toString();
-  }
-
   sendMetricToGrafana(metricPrefix, metricName, metricValue) {
-    const metric = `${metricPrefix},source=${config.metrics.source}, ${metricName}=${metricValue}, ${this.getCurrentTimeToString()}`;
+    const metric = `${metricPrefix},source=${config.metrics.source} ${metricName}=${metricValue}`;
 
     fetch(`${config.metrics.url}`, {
       method: 'post',
       body: metric,
       headers: { Authorization: `Bearer ${config.metrics.userId}:${config.metrics.apiKey}` },
     })
-      .then((response) => {
+      .then(async (response) => {
         if (!response.ok) {
-          console.error('Failed to push metrics data to Grafana');
+          const errorText = await response.text();
+          console.error('Failed to push metrics data to Grafana:', errorText);
         } else {
           console.log(`Pushed ${metric}`);
         }
