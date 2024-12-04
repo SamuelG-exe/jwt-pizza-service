@@ -95,7 +95,7 @@ authRouter.put(
   })
 );
 
-// logout
+// logout 
 authRouter.delete(
   '/',
   authRouter.authenticateToken,
