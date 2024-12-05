@@ -7,14 +7,4 @@ export default [
   {languageOptions: { globals: globals.node }},
   { languageOptions: { globals: globals.jest } },
   pluginJs.configs.recommended,
-  {
-    "overrides": [
-      {
-        "files": ["loadTests/**/*.js"],
-        "parserOptions": {
-          "sourceType": "module"
-        }
-      }
-    ]
-  }
 ];
