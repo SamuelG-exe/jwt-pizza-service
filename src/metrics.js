@@ -56,7 +56,7 @@ class Metrics {
       try {
 
         // HTTP Methods metrics
-        this.sendMetricToGrafana('httpMethods', 'total_requests', this.totalRequests);
+        this.sendMetricToGrafana('httpMethods', 'total_requests', this.getTotalRequests());
         this.sendMetricToGrafana('httpMethods', 'GET_requests', this.httpMethods.GET);
         this.sendMetricToGrafana('httpMethods', 'POST_requests', this.httpMethods.POST);
         this.sendMetricToGrafana('httpMethods', 'DELETE_requests', this.httpMethods.DELETE);
@@ -113,9 +113,6 @@ class Metrics {
 // HTTP Request Trackers
 requestTracker(req, res, next) {
   res.on('finish', () => {
-    // Increment total requests for any HTTP request
-    this.totalRequests++;
-
     // Increment the specific HTTP method count only if it exists in the map
     if (Object.prototype.hasOwnProperty.call(this.httpMethods, req.method)) {
       this.httpMethods[req.method]++;
@@ -130,6 +127,9 @@ trackRequestLatency(req, res, next) {
     this.trackGeneralLatency(startTime);
   });
   next();
+}
+getTotalRequests() {
+  return Object.values(this.httpMethods).reduce((sum, count) => sum + count, 0);
 }
 
 
