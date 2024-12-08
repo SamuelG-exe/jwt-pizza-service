@@ -12,9 +12,8 @@ const app = express();
 app.use(express.json());
 app.use(setAuthUser);
 
-const startTime = Date.now();
 app.use(metrics.requestTracker.bind(metrics));
-metrics.trackGeneralLatency(startTime); 
+app.use(metrics.trackRequestLatency.bind(metrics));
 
 
 app.use((req, res, next) => {
@@ -32,7 +31,6 @@ apiRouter.use('/auth', authRouter);
 apiRouter.use('/order', orderRouter);
 apiRouter.use('/franchise', franchiseRouter);
 
-metrics.trackGeneralLatency(startTime); 
 
 apiRouter.use('/docs', (req, res) => {
   res.json({

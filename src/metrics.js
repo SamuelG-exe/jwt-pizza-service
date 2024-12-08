@@ -12,8 +12,6 @@ class Metrics {
       POST: 0,
       DELETE: 0,
       PUT: 0,
-      generalLatency: []
-
     };
     this.pizzaSales = {
       sales: 0,
@@ -26,6 +24,10 @@ class Metrics {
       failed: 0
     };
     this.currentUsers = 0;
+    this.httpLatency ={     
+      generalLatency: []
+    };
+
 
 
     // This will periodically sent metrics to Grafana
@@ -110,12 +112,26 @@ class Metrics {
 
 // HTTP Request Trackers
 requestTracker(req, res, next) {
-  this.totalRequests++;
-  if (Object.prototype.hasOwnProperty.call(this.httpMethods, req.method)) {
+  res.on('finish', () => {
+    // Increment total requests for any HTTP request
+    this.totalRequests++;
+
+    // Increment the specific HTTP method count only if it exists in the map
+    if (Object.prototype.hasOwnProperty.call(this.httpMethods, req.method)) {
       this.httpMethods[req.method]++;
-  }
+    }
+  });
+
   next();
 }
+trackRequestLatency(req, res, next) {
+  const startTime = Date.now();
+  res.on('finish', () => {
+    this.trackGeneralLatency(startTime);
+  });
+  next();
+}
+
 
 // Pizza Sales Trackers
 trackPizzaSale(revenue){
@@ -136,16 +152,16 @@ trackPizzaLatency(startTime){
     this.pizzaSales.createLatency.shift();
   }
 }
-
-trackGeneralLatency(startTime){
+trackGeneralLatency(startTime) {
   const latency = Date.now() - startTime;
-  this.httpMethods.generalLatency.push(latency);
-  
-  // Keep only last 100 latency measurements
-  if (this.httpMethods.generalLatency.length > 100) {
-    this.httpMethods.generalLatency.shift();
+  this.httpLatency.generalLatency.push(latency);
+
+  // Keep only the last 100 latency measurements
+  if (this.httpLatency.generalLatency.length > 100) {
+    this.httpLatency.generalLatency.shift();
   }
 }
+
 
 // Authentication Trackers
 trackAuthSuccess(){
@@ -169,7 +185,7 @@ trackUserLogout(){
 getAverageLatency(type){
   const latencyArray = type === 'pizza' 
     ? this.pizzaSales.createLatency 
-    : this.httpMethods.generalLatency;
+    : this.httpLatency.generalLatency;
 
   if (latencyArray.length === 0) return 0;
   const sum = latencyArray.reduce((a, b) => a + b, 0);
