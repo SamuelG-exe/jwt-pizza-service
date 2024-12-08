@@ -106,6 +106,7 @@ class Metrics {
       .catch((error) => {
         console.error('Error pushing metrics:', error);
       });
+      this.resetMetrics
   }
 
 //Helper Function to call in other files 
@@ -190,6 +191,41 @@ getAverageLatency(type){
   if (latencyArray.length === 0) return 0;
   const sum = latencyArray.reduce((a, b) => a + b, 0);
   return sum / latencyArray.length;
+}
+
+resetMetrics() {
+  // Reset HTTP Methods metrics
+  this.totalRequests = 0;
+  this.httpMethods = {
+    GET: 0,
+    POST: 0,
+    DELETE: 0,
+    PUT: 0,
+  };
+
+  // Reset pizza sales metrics
+  this.pizzaSales = {
+    sales: 0,
+    revenue: 0,
+    numFails: 0,
+    createLatency: [],
+  };
+
+  // Reset authentication metrics
+  this.authMetrics = {
+    sucsessful: 0,
+    failed: 0,
+  };
+
+  // Reset user metrics
+  this.currentUsers = 0;
+
+  // Reset latency metrics
+  this.httpLatency = {
+    generalLatency: [],
+  };
+
+  console.log("Metrics have been reset.");
 }
 
 }
