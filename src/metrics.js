@@ -106,7 +106,6 @@ class Metrics {
       .catch((error) => {
         console.error('Error pushing metrics:', error);
       });
-      this.resetMetrics
   }
 
 //Helper Function to call in other files 
